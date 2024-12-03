@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "start": "deno run --allow-read ",
+    "answer": "deno run --allow-read ./answer.ts",
+    "test": "deno test --allow-read",
+    "lint": "deno lint"
+  }
+}
