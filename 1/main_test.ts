@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert";
-import { totalDistance, similarityScore } from "./main.ts";
+import { similarityScore, totalDistance } from "./main.ts";
 
 const testInput = Deno.readTextFileSync("./test-input.txt");
 

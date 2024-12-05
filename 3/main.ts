@@ -6,7 +6,7 @@ export function memoryScan(data: string): number {
   }, 0);
 }
 
-export function memoryScanWithToggles(data: string): any {
+export function memoryScanWithToggles(data: string): number {
   const instructionRegex = /mul\(\d+,\d+\)|do\(\)|don't\(\)/g;
   let doOp = true;
 

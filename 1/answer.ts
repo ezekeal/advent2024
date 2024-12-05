@@ -1,4 +1,4 @@
-import { totalDistance, similarityScore } from "./main.ts";
+import { similarityScore, totalDistance } from "./main.ts";
 
 console.log(`part1: ${totalDistance(Deno.readTextFileSync("./input.txt"))}`);
 

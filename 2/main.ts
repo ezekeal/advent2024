@@ -1,10 +1,12 @@
 export function countSafeReports(data: string, dampen = false) {
-  const reports = data.split('\n').map(line => line.split(' ').map( number => parseInt(number)));
-  return reports.filter(report => reportIsSafe(report, dampen)).length;
+  const reports = data.split("\n").map((line) =>
+    line.split(" ").map((number) => parseInt(number))
+  );
+  return reports.filter((report) => reportIsSafe(report, dampen)).length;
 }
 
 function reportIsSafe(report: number[], dampen = false): boolean {
-  const firstDiff = report[0] - report[1]
+  const firstDiff = report[0] - report[1];
   if (firstDiff === 0) return dampen ? reportIsSafe(report.slice(1)) : false;
   const consistentTrend = firstDiff > 0 ? isDecreasing : isIncreasing;
 
@@ -21,7 +23,9 @@ function reportIsSafe(report: number[], dampen = false): boolean {
 }
 
 function checkVariants(report: number[]) {
-  return report.some((_l, i, arr) => reportIsSafe([...arr.slice(0, i), ...arr.slice(i + 1)]))
+  return report.some((_l, i, arr) =>
+    reportIsSafe([...arr.slice(0, i), ...arr.slice(i + 1)])
+  );
 }
 
 function isInTolerance(a: number, b: number): boolean {
