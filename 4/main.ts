@@ -72,10 +72,13 @@ const solvePart2 = (input: string) => {
     const center = charGrid[y][x];
     if (center !== "A") return false;
 
-    const corners = [[x + 1, y + 1], [x - 1, y - 1], [x - 1, y + 1], [
+    const cornerCoordinates = [[x + 1, y + 1], [x - 1, y - 1], [x - 1, y + 1], [
       x + 1,
       y - 1,
-    ]].map(([cx, cy]) => charGrid[cy][cx]);
+    ]];
+
+    const corners = cornerCoordinates.map(([cx, cy]) => charGrid[cy][cx]);
+    if (corners[0] == corners[1] || corners[2] == corners[3]) return false;
 
     const charCount = new Map([["S", 0], ["M", 0]]);
     for (const char of corners) {
