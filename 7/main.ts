@@ -1,35 +1,66 @@
-import { example, full } from "./data.ts";
+import { example } from "./data.ts";
 
 type Equation = {
-    answer: number;
-    operands: number[];
+  answer: number;
+  operands: number[];
 };
 
 type Operator = (n1: number, n2: number) => number;
 
+const operations: Map<string, Operator> = new Map([
+  ["0", add],
+  ["1", multiply],
+  ["2", concat],
+]);
+
 const input = example;
 
-const equations: Equation[] = input.split('\n').map(eq => {
-    const [answer, numbers] = eq.split(': ');
-    return { answer: parseInt(answer), operands: numbers.split(' ').map(n => parseInt(n))}
+const equations: Equation[] = input.split("\n").map((eq) => {
+  const [answer, numbers] = eq.split(": ");
+  return {
+    answer: parseInt(answer),
+    operands: numbers.split(" ").map((n) => parseInt(n)),
+  };
 });
 
-const validEquations = equations.filter(validEquationExists);
-
-function validEquationExists({answer, operands}: Equation): boolean {
-    const operatorCount = operands.length - 1;
-    for(let i = 0; i < 2 ** operatorCount; i++) {
-        const operators = permutateOperators(operatorCount, i);
-        const [first, ...rest] = operands
-        const total = rest.reduce((total, n) => operators.pop()!(total, n), first)
-        if (total === answer) return true;
-    }
-    return false;
+function validEquationExists(
+  { answer, operands }: Equation,
+  operatorTypes: number,
+): boolean {
+  const operatorCount = operands.length - 1;
+  for (let i = 0; i < operatorTypes ** operatorCount; i++) {
+    const operatorIds = permutateOperators(operatorCount, i, operatorTypes);
+    const [first, ...rest] = operands;
+    const total = rest.reduce((total, n) => operations.get(operatorIds.pop()!)!(total, n), first);
+    if (total > answer) return false;
+    if (total === answer) return true;
+  }
+  return false;
 }
 
-function permutateOperators(length, iteration): Operator[] {
-    return iteration.toString(2);
-    //console.log([0, 1, 2, 3, 4, 5].map(n => n.toString(2)).map(n => n.padStart(4 - n.length, '0')));
+function permutateOperators(
+  length: number,
+  iteration: number,
+  operatorTypes: number,
+): string[] {
+  let operatorMap = iteration.toString(operatorTypes);
+  operatorMap = operatorMap.padStart(length, "0");
+  return operatorMap.split("");
 }
 
-console.log(validEquations);
+function add(x: number, y: number): number {
+  return x + y;
+}
+function multiply(x: number, y: number): number {
+  return x * y;
+}
+function concat(x: number, y: number): number {
+  return parseInt(`${x}${y}`);
+}
+
+console.log(
+  equations.filter((eq) => validEquationExists(eq, 3)).reduce(
+    (total, { answer }) => answer + total,
+    0,
+  ),
+);
