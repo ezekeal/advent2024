@@ -67,7 +67,10 @@ const solvePart2 = (input: string) => {
   const getCharGrid = (input: string) =>
     input.split("\n").map((line) => line.split(""));
   function validateXmas(x: number, y: number, charGrid: string[][]): boolean {
-    if (x === 0 || y === 0 || x === charGrid[0].length - 1 || y === charGrid.length - 1) return false;
+    if (
+      x === 0 || y === 0 || x === charGrid[0].length - 1 ||
+      y === charGrid.length - 1
+    ) return false;
 
     const center = charGrid[y][x];
     if (center !== "A") return false;
@@ -89,16 +92,16 @@ const solvePart2 = (input: string) => {
     return charCount.get("M") === 2 && charCount.get("S") === 2;
   }
 
-  const charGrid = getCharGrid(input)
+  const charGrid = getCharGrid(input);
   let xmasCount = 0;
-  for(const [y, row] of charGrid.entries()) {
-    for(const [x, _char] of row.entries()) {
-      if(validateXmas(x, y, charGrid)) {
-        xmasCount++
+  for (const [y, row] of charGrid.entries()) {
+    for (const [x, _char] of row.entries()) {
+      if (validateXmas(x, y, charGrid)) {
+        xmasCount++;
       }
     }
   }
   return xmasCount;
 };
 
-console.log(solvePart2(Deno.readTextFileSync('./data.txt')));
+console.log(solvePart2(Deno.readTextFileSync("./data.txt")));

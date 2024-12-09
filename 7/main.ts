@@ -31,7 +31,10 @@ function validEquationExists(
   for (let i = 0; i < operatorTypes ** operatorCount; i++) {
     const operatorIds = permutateOperators(operatorCount, i, operatorTypes);
     const [first, ...rest] = operands;
-    const total = rest.reduce((total, n) => operations.get(operatorIds.pop()!)!(total, n), first);
+    const total = rest.reduce(
+      (total, n) => operations.get(operatorIds.pop()!)!(total, n),
+      first,
+    );
     if (total > answer) return false;
     if (total === answer) return true;
   }

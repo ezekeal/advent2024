@@ -3,7 +3,7 @@ import { Dataset, Direction, Position, State } from "./types.ts";
 
 // Constants
 const OBSTACLE = "#";
-const MARKED_OBSTACLE = "!"
+const MARKED_OBSTACLE = "!";
 const moveMap: Map<Direction, (p: Position) => Position> = new Map([
   ["^", ([x, y]) => [x, y - 1]],
   ["V", ([x, y]) => [x, y + 1]],
@@ -49,9 +49,18 @@ function runPlan(input: Dataset) {
     return { ...state, totalPositions: totalPositions + 1, outOfBounds };
   };
   const turn = (state: State): State => {
-    const { guardState, grid, nextChar, nextPosition, outOfBounds, visitedObstacles } = state;
+    const {
+      guardState,
+      grid,
+      nextChar,
+      nextPosition,
+      outOfBounds,
+      visitedObstacles,
+    } = state;
     if (outOfBounds || nextChar !== OBSTACLE) return state;
-    const looping = visitedObstacles.has(nextPosition.join() + guardState.direction);
+    const looping = visitedObstacles.has(
+      nextPosition.join() + guardState.direction,
+    );
     visitedObstacles.add(nextPosition.join() + guardState.direction);
     let newState = {
       ...state,
@@ -108,7 +117,7 @@ function runPlan(input: Dataset) {
 
   while (!state.outOfBounds) {
     state = [mark, turn, move].reduce(applyStep, state);
-    if(state.looping) break;
+    if (state.looping) break;
   }
 
   return state;
@@ -116,16 +125,17 @@ function runPlan(input: Dataset) {
 
 if (import.meta.main) {
   let totalPositions = 0;
-  const [guardState, map] = full
-  const obstacleMap = runPlan([guardState, map]).grid.map(rows => rows.join('')).join('\n')
-  for(let i = 0; i < map.length; i++) {
-    if (obstacleMap[i] !== 'X') continue;
-    const mapWithNewObstacle = map.slice(0, i) + '#' + map.slice(i + 1);
-    const endState = runPlan([guardState, mapWithNewObstacle])
+  const [guardState, map] = full;
+  const obstacleMap = runPlan([guardState, map]).grid.map((rows) =>
+    rows.join("")
+  ).join("\n");
+  for (let i = 0; i < map.length; i++) {
+    if (obstacleMap[i] !== "X") continue;
+    const mapWithNewObstacle = map.slice(0, i) + "#" + map.slice(i + 1);
+    const endState = runPlan([guardState, mapWithNewObstacle]);
     if (endState.looping) {
       totalPositions++;
     }
   }
-  console.log(totalPositions)
+  console.log(totalPositions);
 }
-

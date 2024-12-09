@@ -1,0 +1,11 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-read --watch main.ts example.txt",
+    "dev2": "deno run --allow-read --watch main.ts example.txt --part2",
+    "part1": "deno run --allow-read main.ts data.txt",
+    "part2": "deno run --allow-read main.ts data.txt --part2"
+  },
+  "imports": {
+    "@std/cli": "jsr:@std/cli@^1.0.8"
+  }
+}
