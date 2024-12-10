@@ -1,33 +1,66 @@
+import { parseArgs } from "@std/cli/parse-args";
 const [dataFile] = Deno.args;
+const flags = parseArgs(Deno.args, {
+  boolean: ["part2"],
+});
 
 const data = Deno.readTextFileSync(dataFile);
 
-function expand(input: string): [string, number] {
+function expand(input: string): string[] {
   const nextFileName = fileNameGenerator();
   const isFile = fileToggle();
-  let expanded = "";
-  let digits = 0;
+  const expanded = [];
   for (const c of input) {
-    const digit = parseInt(c);
-    const nextChar = isFile.next().value ? nextFileName.next().value : ".";
-    digits += nextChar !== "." ? digit : 0;
-    expanded = expanded.concat(nextChar.repeat(digit));
+    const multiplier = parseInt(c);
+    const nextBlock = new Array(multiplier);
+    const nextValue = isFile.next().value ? nextFileName.next().value : ".";
+    nextBlock.fill(nextValue)
+    expanded.push(nextBlock)
   }
-  console.log(expanded.length)
-  return [expanded, digits];
+  return expanded.flat();
 }
 
-function shift([input, digits]: [string, number]): string {
-  let shifted = input.slice().split("");
-  let lastIndex = shifted.length - 1;
-  for (const [i, c] of shifted.entries()) {
-    if (digits-- <= 0) break;
+function shift(input: string[]): string[] {
+  const values = input.slice();
+  const shiftedValues = reverseQueueWithIndex(values)
+  let nextShiftedValue = shiftedValues.next().value;
+  for (const [i, c] of values.entries()) {
+    const [sValueIndex, sValue] = nextShiftedValue;
+    if (sValueIndex <= i) {
+      return values.fill('.', i + 1);
+    };
     if (c !== ".") continue;
-    while (shifted[lastIndex] === ".") lastIndex--;
-    shifted = shifted.with(i, shifted[lastIndex]).with(lastIndex, ".");
+    values[i] = sValue;
+    nextShiftedValue = shiftedValues.next().value;
   }
-  console.log('shifted')
-  return shifted.join("");
+  return values;
+}
+
+function shiftWholeFiles(input: string): [number, string][] {
+  const nextFileName = fileNameGenerator();
+  const isFile = fileToggle();
+  const expansions: [number, string][] = input.split('').map(size => [
+    parseInt(size),
+    isFile.next().value ? nextFileName.next().value : "."
+  ])
+
+  const shifted = expansions.slice()
+  const lastIndex = shifted.length - 1;
+  for(let moveIndex = lastIndex; moveIndex > 0;  moveIndex--) {
+    const [moveFileSize, moveFileName] = shifted[moveIndex];
+    if(moveFileName === '.') continue;
+    for(let index = 0; index < moveIndex; index++) {
+      const [spaceSize, spaceFileName] = shifted[index];
+      if(spaceFileName !== '.') continue;
+      if(spaceSize < moveFileSize) continue;
+      shifted[index] = [moveFileSize, moveFileName];
+      shifted[moveIndex] = [moveFileSize, '.']
+      const sizeDifference = spaceSize - moveFileSize;
+      if(sizeDifference > 0) shifted.splice(index + 1, 0, [sizeDifference, '.'])
+      break;
+    }
+  }
+  return shifted;
 }
 
 function* fileNameGenerator(): Generator<string> {
@@ -45,8 +78,27 @@ function* fileToggle(): Generator<boolean> {
   }
 }
 
-console.log(
-  shift(expand(data)).split(".")[0].split("").reduce((total, digit, i) =>
-    total + i * parseInt(digit)
-  , 0),
-);
+function* reverseQueueWithIndex(arr: string[]): Generator<[number, string]>  {
+  const indexedNumbers = Array.from(arr.entries()).reverse().filter(([,x]) => x !== '.')
+  for(const n of indexedNumbers) {
+    yield n
+  }
+}
+
+
+if(!flags.part2) {
+  const compactedData =  shift(expand(data));
+  const compactedValues = compactedData.slice(0, compactedData.indexOf('.'))
+  console.log(
+    compactedValues.reduce((total, digit, i) => total + i * parseInt(digit), 0),
+  );
+} else {
+  const compactedData = (shiftWholeFiles(data)).flatMap(([size, fileName]) => new Array(size).fill(fileName));
+  const checksum = compactedData.reduce((total, fileName, i) => {
+    if(fileName === '.') return total;
+    return total + i * parseInt(fileName)
+  }, 0)
+
+  console.log(checksum);
+}
+
