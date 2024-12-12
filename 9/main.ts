@@ -14,21 +14,21 @@ function expand(input: string): string[] {
     const multiplier = parseInt(c);
     const nextBlock = new Array(multiplier);
     const nextValue = isFile.next().value ? nextFileName.next().value : ".";
-    nextBlock.fill(nextValue)
-    expanded.push(nextBlock)
+    nextBlock.fill(nextValue);
+    expanded.push(nextBlock);
   }
   return expanded.flat();
 }
 
 function shift(input: string[]): string[] {
   const values = input.slice();
-  const shiftedValues = reverseQueueWithIndex(values)
+  const shiftedValues = reverseQueueWithIndex(values);
   let nextShiftedValue = shiftedValues.next().value;
   for (const [i, c] of values.entries()) {
     const [sValueIndex, sValue] = nextShiftedValue;
     if (sValueIndex <= i) {
-      return values.fill('.', i + 1);
-    };
+      return values.fill(".", i + 1);
+    }
     if (c !== ".") continue;
     values[i] = sValue;
     nextShiftedValue = shiftedValues.next().value;
@@ -39,24 +39,26 @@ function shift(input: string[]): string[] {
 function shiftWholeFiles(input: string): [number, string][] {
   const nextFileName = fileNameGenerator();
   const isFile = fileToggle();
-  const expansions: [number, string][] = input.split('').map(size => [
+  const expansions: [number, string][] = input.split("").map((size) => [
     parseInt(size),
-    isFile.next().value ? nextFileName.next().value : "."
-  ])
+    isFile.next().value ? nextFileName.next().value : ".",
+  ]);
 
-  const shifted = expansions.slice()
+  const shifted = expansions.slice();
   const lastIndex = shifted.length - 1;
-  for(let moveIndex = lastIndex; moveIndex > 0;  moveIndex--) {
+  for (let moveIndex = lastIndex; moveIndex > 0; moveIndex--) {
     const [moveFileSize, moveFileName] = shifted[moveIndex];
-    if(moveFileName === '.') continue;
-    for(let index = 0; index < moveIndex; index++) {
+    if (moveFileName === ".") continue;
+    for (let index = 0; index < moveIndex; index++) {
       const [spaceSize, spaceFileName] = shifted[index];
-      if(spaceFileName !== '.') continue;
-      if(spaceSize < moveFileSize) continue;
+      if (spaceFileName !== ".") continue;
+      if (spaceSize < moveFileSize) continue;
       shifted[index] = [moveFileSize, moveFileName];
-      shifted[moveIndex] = [moveFileSize, '.']
+      shifted[moveIndex] = [moveFileSize, "."];
       const sizeDifference = spaceSize - moveFileSize;
-      if(sizeDifference > 0) shifted.splice(index + 1, 0, [sizeDifference, '.'])
+      if (sizeDifference > 0) {
+        shifted.splice(index + 1, 0, [sizeDifference, "."]);
+      }
       break;
     }
   }
@@ -78,27 +80,29 @@ function* fileToggle(): Generator<boolean> {
   }
 }
 
-function* reverseQueueWithIndex(arr: string[]): Generator<[number, string]>  {
-  const indexedNumbers = Array.from(arr.entries()).reverse().filter(([,x]) => x !== '.')
-  for(const n of indexedNumbers) {
-    yield n
+function* reverseQueueWithIndex(arr: string[]): Generator<[number, string]> {
+  const indexedNumbers = Array.from(arr.entries()).reverse().filter(([, x]) =>
+    x !== "."
+  );
+  for (const n of indexedNumbers) {
+    yield n;
   }
 }
 
-
-if(!flags.part2) {
-  const compactedData =  shift(expand(data));
-  const compactedValues = compactedData.slice(0, compactedData.indexOf('.'))
+if (!flags.part2) {
+  const compactedData = shift(expand(data));
+  const compactedValues = compactedData.slice(0, compactedData.indexOf("."));
   console.log(
     compactedValues.reduce((total, digit, i) => total + i * parseInt(digit), 0),
   );
 } else {
-  const compactedData = (shiftWholeFiles(data)).flatMap(([size, fileName]) => new Array(size).fill(fileName));
+  const compactedData = (shiftWholeFiles(data)).flatMap(([size, fileName]) =>
+    new Array(size).fill(fileName)
+  );
   const checksum = compactedData.reduce((total, fileName, i) => {
-    if(fileName === '.') return total;
-    return total + i * parseInt(fileName)
-  }, 0)
+    if (fileName === ".") return total;
+    return total + i * parseInt(fileName);
+  }, 0);
 
   console.log(checksum);
 }
-
