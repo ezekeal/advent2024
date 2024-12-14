@@ -1,8 +1,41 @@
-export function add(a: number, b: number): number {
-  return a + b;
+import { parseArgs } from "@std/cli/parse-args";
+import { Frequencies }  from '../utils/frequency.ts'
+const [dataFile] = Deno.args;
+const flags = parseArgs(Deno.args, {
+  boolean: ["part2"],
+});
+const input = Deno.readTextFileSync(dataFile)
+let stones = input.split(' ').map(Number)
+const frequencies: Frequencies<number>(stones)
+
+let blinks = 25;
+if(flags.part2) {
+  blinks = 75
 }
 
-// Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts
-if (import.meta.main) {
-  console.log("Add 2 + 3 =", add(2, 3));
+for(let i = 0; i < blinks; i++) {
+  stones = stones.flatMap(blink);
+  console.log(i, stones.length)
+}
+
+console.log(stones.length)
+
+
+function blink(n: number): number[] {
+  if(n === 0)  {
+    return [1]
+  }
+  const nStr = n.toString()
+  const digits = nStr.length
+  if(digits % 2 === 0) {
+    return [nStr.slice(0, digits/2), nStr.slice(digits / 2)].map(Number)
+  }
+
+  return [n * 2024]
+}
+
+function blinkV2(frequencies: Frequencies) {
+  for (const n of frequencies) {
+    
+  }
 }

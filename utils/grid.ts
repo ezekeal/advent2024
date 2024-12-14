@@ -1,7 +1,7 @@
 export type Point = { row: number; col: number };
 
 export class Matrix<T> {
-  private data: T[][];
+  private readonly data: T[][];
 
   constructor(data: T[][]) {
     this.data = data;
