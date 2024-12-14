@@ -36,6 +36,14 @@ export class Matrix<T> {
     return new Matrix(data);
   }
 
+  forEach<U>(fn: (val: T, r: number, c: number) => U) {
+    for (const [r, row] of this.data.entries()) {
+      for (const [c, val] of row.entries()) {
+        fn(val, r, c);
+      }
+    }
+  }
+
   map<U>(fn: (val: T, r: number, c: number) => U): Matrix<U> {
     const mapped = this.data.map((row, r) =>
       row.map((val, c) => fn(val, r, c))
